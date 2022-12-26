@@ -15,7 +15,7 @@ extension Benchmark {
     sizes: [Size],
     options: Options,
     delegate: (Event) throws -> Void = { _ in }
-  ) throws {
+  ) async throws {
     let taskTitles = tasks.map { $0.id }
 
     try delegate(.startCycle(tasks: taskTitles, sizes: sizes))
@@ -37,7 +37,7 @@ extension Benchmark {
         }
 
         try delegate(.startTask(task: task.id, size: size))
-        if let time = task.measure(size: size, input: input, options: options) {
+        if let time = await task.measure(size: size, input: input, options: options) {
           try delegate(.stopTask(task: task.id, size: size, time: time))
           // If we have exceeded the cutoff, then don't try running the task at
           // this size or larger ever again.
@@ -66,11 +66,11 @@ extension Benchmark {
   public func run(
     options: Options,
     delegate: (Event) throws -> Void
-  ) throws {
+  ) async throws {
     let tasks = try options.resolveTasks(from: self)
     guard let cycles = options.cycles else {
       while true {
-        try measureOneCycle(
+        try await measureOneCycle(
           tasks: tasks,
           sizes: options.sizes,
           options: options,
@@ -81,7 +81,7 @@ extension Benchmark {
       throw Error("Number of cycles cannot be negative")
     }
     for _ in 0 ..< cycles {
-      try measureOneCycle(
+      try await measureOneCycle(
         tasks: tasks,
         sizes: options.sizes,
         options: options,

@@ -13,7 +13,7 @@ import ArgumentParser
 import Foundation // for setbuf
 
 extension Benchmark {
-  public func main() {
+  public func main() async {
     // Turn off output buffering.
     setbuf(stdout, nil)
     setbuf(stderr, nil)
@@ -29,7 +29,9 @@ extension Benchmark {
 
     do {
       if let command = command as? _BenchmarkCommand {
-        try command.run(benchmark: self)
+        try await command.run(benchmark: self)
+      } else if var command = command as? AsyncParsableCommand {
+        try await command.run()
       } else {
         try command.run()
       }

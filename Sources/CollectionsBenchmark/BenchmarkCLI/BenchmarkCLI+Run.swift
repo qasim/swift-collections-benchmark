@@ -50,7 +50,7 @@ extension _BenchmarkCLI {
     @Option(help: "What to do with existing measurements (append|replace|replace-all, default: append)")
     internal var mode: _Document.Mode = .append
 
-    internal func run(benchmark: Benchmark) throws {
+    internal func run(benchmark: Benchmark) async throws {
       if benchmark.tasks.isEmpty {
         throw Benchmark.Error("This benchmark instance has no tasks defined")
       }
@@ -73,7 +73,7 @@ extension _BenchmarkCLI {
         opening: output,
         format: outputFormat,
         mode: mode)
-      try document.run(benchmark: benchmark, options: options)
+      try await document.run(benchmark: benchmark, options: options)
     }
   }
 }

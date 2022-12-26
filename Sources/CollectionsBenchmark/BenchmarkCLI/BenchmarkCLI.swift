@@ -11,8 +11,8 @@
 
 import ArgumentParser
 
-internal protocol _BenchmarkCommand: ParsableCommand {
-  func run(benchmark: Benchmark) throws
+internal protocol _BenchmarkCommand: AsyncParsableCommand {
+  func run(benchmark: Benchmark) async throws
 }
 
 internal struct _BenchmarkCLI: ParsableCommand {

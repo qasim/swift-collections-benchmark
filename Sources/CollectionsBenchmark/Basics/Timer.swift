@@ -25,20 +25,20 @@ public struct Timer {
   }
   
   internal static func _measureFirst(
-    _ body: (inout Timer) -> Void
-  ) -> (elapsedTime: Time, hasNestedMeasurement: Bool) {
+    _ body: (inout Timer) async -> Void
+  ) async -> (elapsedTime: Time, hasNestedMeasurement: Bool) {
     var timer = Timer(_expectNested: nil)
     let start = Tick.now
-    body(&timer)
+    await body(&timer)
     let end = Tick.now
     let elapsed = timer.elapsedTime ?? end.elapsedTime(since: start)
     return (elapsedTime: elapsed._orIfZero(Tick.resolution),
             hasNestedMeasurement: timer.elapsedTime != nil)
   }
 
-  internal static func _nestedMeasure(_ body: (inout Timer) -> Void) -> Time {
+  internal static func _nestedMeasure(_ body: (inout Timer) async -> Void) async -> Time {
     var timer = Timer(_expectNested: true)
-    body(&timer)
+    await body(&timer)
     guard let elapsed = timer.elapsedTime else {
       fatalError("Inconsistent timer use: Expected call to Timer.measure")
     }
@@ -47,13 +47,13 @@ public struct Timer {
   
   internal static func _iteratingMeasure(
     iterations: Int,
-    _ body: (inout Timer) -> Void
-  ) -> Time {
+    _ body: (inout Timer) async -> Void
+  ) async -> Time {
     precondition(iterations > 0)
     var timer = Timer(_expectNested: false)
     let start = Tick.now
     for _ in 0 ..< iterations {
-      body(&timer)
+      await body(&timer)
     }
     let end = Tick.now
     let elapsed = end.elapsedTime(since: start)._orIfZero(Tick.resolution)
@@ -61,11 +61,11 @@ public struct Timer {
   }
   
   @inline(never)
-  public mutating func measure(_ body: () -> Void) {
+  public mutating func measure(_ body: () async -> Void) async {
     precondition(_expectNested != false,
                  "Inconsistent timer use: Unexpected call to Timer.measure")
     let start = Tick.now
-    body()
+    await body()
     let end = Tick.now
     elapsedTime = end.elapsedTime(since: start)
     _expectNested = false

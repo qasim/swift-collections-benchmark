@@ -10,7 +10,7 @@
 //===----------------------------------------------------------------------===//
 
 public struct Benchmark {
-  public typealias TaskBody = (inout Timer) -> Void
+  public typealias TaskBody = (inout Timer) async -> Void
 
   public let title: String
   internal var _tasks: _SimpleOrderedDictionary<String, AnyTask> = [:]

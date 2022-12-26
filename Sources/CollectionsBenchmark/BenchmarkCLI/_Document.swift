@@ -101,7 +101,7 @@ internal struct _Document {
     _isDirty = false
   }
 
-  mutating func run(benchmark: Benchmark, options: Benchmark.Options) throws {
+  mutating func run(benchmark: Benchmark, options: Benchmark.Options) async throws {
     let tasks = try options.resolveTasks(from: benchmark)
     let sizes = try options.resolveSizes()
     print("""
@@ -146,7 +146,7 @@ internal struct _Document {
     print("Collecting data:")
     let start = Tick.now
     var needDot = false
-    try benchmark.run(options: options) { event in
+    try await benchmark.run(options: options) { event in
       switch event {
       case .startCycle:
         print("  ", terminator: "")

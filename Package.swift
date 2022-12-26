@@ -33,12 +33,13 @@ if settings?.isEmpty == true { settings = nil }
 
 let package = Package(
   name: "swift-collections-benchmark",
+  platforms: [.macOS(.v10_15)],
   products: [
     .library(name: "CollectionsBenchmark", targets: ["CollectionsBenchmark"]),
   ],
   dependencies: [
     .package(url: "https://github.com/apple/swift-argument-parser", from: "1.1.4"),
-    .package(url: "https://github.com/apple/swift-system", from: "1.2.1"),
+    .package(url: "https://github.com/apple/swift-system", from: "1.1.1"),
   ],
   targets: [
     .target(

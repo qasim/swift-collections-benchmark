@@ -37,7 +37,7 @@ public struct AnyTask {
   public var title: String { _box.title }
   public var maxSize: Int? { _box.maxSize }
 
-  public func prepare(input: Any) -> ((inout Timer) -> Void)? {
+  public func prepare(input: Any) -> ((inout Timer) async -> Void)? {
     _box.prepare(input: input)
   }
 
@@ -45,8 +45,8 @@ public struct AnyTask {
     size: Size,
     input: Any,
     options: Benchmark.Options
-  ) -> Time? {
-    _box.measure(size: size, input: input, options: options)
+  ) async -> Time? {
+    await _box.measure(size: size, input: input, options: options)
   }
 
   internal func withLabel(_ label: String) -> AnyTask {
@@ -72,7 +72,7 @@ internal class _AnyTask {
   var title: String { fatalError("Not implemented") }
   var maxSize: Int? { fatalError("Not implemented") }
 
-  func prepare(input: Any) -> ((inout Timer) -> Void)? {
+  func prepare(input: Any) -> ((inout Timer) async -> Void)? {
     fatalError("Not implemented")
   }
 
@@ -80,7 +80,7 @@ internal class _AnyTask {
     size: Size,
     input: Any,
     options: Benchmark.Options
-  ) -> Time? {
+  ) async -> Time? {
     fatalError("Not implemented")
   }
 }
@@ -99,7 +99,7 @@ internal class _ConcreteTask<Input>: _AnyTask {
   override var title: String { _task.title }
   override var maxSize: Int? { _task.maxSize }
 
-  override func prepare(input: Any) -> ((inout Timer) -> Void)? {
+  override func prepare(input: Any) -> ((inout Timer) async -> Void)? {
     guard let input_ = input as? Input else {
       preconditionFailure(
         "Unexpected input; expected \(Input.self), actual \(type(of: input))")
@@ -111,11 +111,11 @@ internal class _ConcreteTask<Input>: _AnyTask {
     size: Size,
     input: Any,
     options: Benchmark.Options
-  ) -> Time? {
+  ) async -> Time? {
     guard let input_ = input as? Input else {
       preconditionFailure(
         "Unexpected input; expected \(Input.self), actual \(type(of: input))")
     }
-    return _task.measure(size: size, input: input_, options: options)
+    return await _task.measure(size: size, input: input_, options: options)
   }
 }

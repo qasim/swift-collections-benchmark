@@ -47,7 +47,7 @@ extension _BenchmarkCLI.Library {
     @Option(help: "What to do with existing measurements (append|replace|replace-all, default: append)")
     internal var mode: _Document.Mode = .append
 
-    internal func run(benchmark: Benchmark) throws {
+    internal func run(benchmark: Benchmark) async throws {
       let library = try benchmark._loadLibrary(self.library)
 
       var taskSelection = Benchmark.Options.TaskSelection.empty
@@ -65,7 +65,7 @@ extension _BenchmarkCLI.Library {
         opening: output,
         format: outputFormat,
         mode: mode)
-      try document.run(benchmark: benchmark, options: options)
+      try await document.run(benchmark: benchmark, options: options)
       try document.saveIfNeeded()
     }
   }
